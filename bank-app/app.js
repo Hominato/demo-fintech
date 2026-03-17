@@ -7,7 +7,7 @@ const initialState = {
         accountNo: "8822446600",
         balance: 5620400.50,
         nextOfKin: "Alice Becker",
-        address: "Avda. Diagonal 621-629, Barcelona, Spain",
+        address: "Passeig de Gràcia, 43, 08007, Barcelona, Spain",
         cardNumber: "4532 8822 4466 0012",
         cvv: "321",
         expiry: "09/28"

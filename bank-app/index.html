@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Caixa Bank</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="auth-container">
+
+    <div class="auth-card">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <img src="logo.png" alt="Caixa Bank Logo" style="width: 80px; margin-bottom: 1rem;">
+            <h1 style="color: var(--primary); font-size: 1.5rem; margin-bottom: 0.5rem;">Caixa Bank</h1>
+            <p style="color: var(--text-muted);">Secure access to your finances</p>
+        </div>
+
+        <form id="loginForm">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="EMAIL" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required>
+
+            <div id="loginError" class="text-danger" style="margin-bottom: 1rem; display: none;">Invalid username or
+                password</div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Sign In</button>
+        </form>
+
+        <p style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--text-muted);">
+        </p>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (login(user, pass)) {
+                window.location.href = 'dashboard.html';
+            } else {
+                errorDiv.style.display = 'block';
+            }
+        });
+
+        // Redirect if already logged in
+        if (sessionStorage.getItem('bank_session')) {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+
+</html>

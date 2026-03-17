@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Caixa Bank</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .summary-card.expense {
+            border-left-color: var(--danger);
+        }
+
+        .summary-card.income {
+            border-left-color: var(--secondary);
+        }
+
+        .transaction-list {
+            list-style: none;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+
+<body class="bg-mesh-dashboard">
+    <aside class="sidebar">
+        <div class="flex justify-between items-center" style="margin-bottom: 3rem; padding-left: 1rem;">
+            <div class="flex items-center gap-2">
+                <img src="logo.png" alt="Logo" style="width: 32px;">
+                <h2 style="color: white; font-weight: 700;">Caixa Bank</h2>
+            </div>
+        </div>
+        <nav style="display: flex; flex-direction: column; gap: 0.25rem; margin-top: 1rem;">
+            <a href="dashboard.html" class="nav-link active">
+                <span>🏠</span> Dashboard
+            </a>
+            <a href="transfer.html" class="nav-link">
+                <span>💸</span> Transfer
+            </a>
+            <a href="history.html" class="nav-link">
+                <span>📜</span> History
+            </a>
+            <a href="profile.html" class="nav-link">
+                <span>👤</span> Profile
+            </a>
+        </nav>
+        <div style="margin-top: auto;">
+            <button onclick="logout()" class="btn btn-outline"
+                style="width: 100%; border-color: var(--danger); color: var(--danger);">
+                Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <div class="top-bar">
+        <div class="flex items-center gap-2">
+            <img src="logo.png" alt="Logo" style="width: 24px;">
+            <h2 style="color: var(--primary); font-size: 1.25rem;">Caixa Bank</h2>
+        </div>
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    </div>
+
+    <main class="main-content">
+        <header class="flex justify-between items-center" style="margin-bottom: 2rem;">
+            <div>
+                <h1 id="welcomeUser">Welcome back,</h1>
+                <p id="currentDate" style="color: var(--text-muted);"></p>
+            </div>
+            <div class="flex items-center gap-2">
+                <div id="userAvatar"
+                    style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                    JD
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- Left Column: Primary Metrics & Chart -->
+            <div class="left-col">
+                <section class="summary-cards" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="summary-card">
+                        <div class="flex justify-between items-center" style="margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Total Balance</span>
+                            <span style="color: var(--gold);">🏦</span>
+                        </div>
+                        <h2 id="balanceAmount" style="font-size: 1.75rem; color: var(--primary);">$0.00</h2>
+                    </div>
+                    <div class="summary-card" style="border-left-color: var(--secondary);">
+                        <div class="flex justify-between items-center" style="margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Monthly Income</span>
+                            <span style="color: var(--secondary);">📈</span>
+                        </div>
+                        <h2 id="incomeAmount" style="font-size: 1.75rem; color: var(--secondary);">$0.00</h2>
+                    </div>
+                </section>
+
+                <div class="card" style="background: linear-gradient(135deg, var(--bg-card), var(--primary-light)); border: 1px solid var(--border);">
+                    <div class="flex justify-between items-center" style="margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Financial Momentum</h3>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Last 7 Transactions</span>
+                    </div>
+                    <canvas id="trendChart" width="400" height="150" style="width: 100%; height: 150px;"></canvas>
+                </div>
+
+                <section class="card">
+                    <div class="flex justify-between items-center" style="margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Transaction Stream</h3>
+                        <a href="history.html" class="text-xs font-bold" style="color: var(--primary);">Full Ledger →</a>
+                    </div>
+                    <ul id="recentTransactions" class="transaction-list">
+                        <!-- Javascript will populate this -->
+                    </ul>
+                </section>
+            </div>
+
+            <!-- Right Column: Card, Goals & Quick Actions -->
+            <div class="right-col">
+                <div class="virtual-card mb-2">
+                    <div class="flex justify-between items-start">
+                        <div class="card-chip"></div>
+                        <img src="logo.png" alt="Logo" style="width: 30px; filter: brightness(0) invert(1);">
+                    </div>
+                    <div>
+                        <p class="card-number" id="cardNumber">**** **** **** 0012</p>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-xs" style="opacity: 0.7; margin-bottom: 0.25rem;">CARD HOLDER</p>
+                                <p id="cardHolder" style="font-size: 0.875rem; font-weight: 500;">DAVID T. BECKER</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <p class="text-xs" style="opacity: 0.7; margin-bottom: 0.25rem;">EXPIRY</p>
+                                <p id="cardExpiry" style="font-size: 0.875rem; font-weight: 500;">09/28</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2" style="margin-bottom: 2rem;">
+                    <button onclick="openModal('deposit')" class="btn btn-primary" style="flex: 1; justify-content: center;">Deposit</button>
+                    <button onclick="openModal('withdraw')" class="btn btn-outline" style="flex: 1; justify-content: center;">Withdraw</button>
+                </div>
+
+                <section class="card">
+                    <h3 style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem;">Financial Aspirations</h3>
+                    <div id="savingsGoals" class="flex flex-col gap-4">
+                        <!-- Javascript will populate -->
+                    </div>
+                </section>
+
+                <div class="card" style="background: var(--bg-main); border: 2px dashed var(--border); text-align: center;">
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Need assistance?</p>
+                    <button class="btn btn-outline" style="width: 100%; justify-content: center;">Contact Priority Desk</button>
+                </div>
+            </div>
+        </div>
+
+        <footer
+            style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.875rem;">
+            <div class="flex justify-center gap-4" style="margin-bottom: 1rem;">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+            <p>&copy; 2026 Caixa Bank. All rights reserved. Your trust, our priority.</p>
+        </footer>
+    </main>
+
+    <!-- Simple Modal Overlay (Will be used for Deposit/Withdraw) -->
+    <div id="modalOverlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="card" style="width: 100%; max-width: 400px;">
+            <h3 id="modalTitle" style="margin-bottom: 1rem;">Modal Title</h3>
+            <label id="modalLabel">Amount</label>
+            <input type="number" id="modalAmount" placeholder="0.00">
+            <div class="flex justify-between mt-4">
+                <button onclick="closeModal()" class="btn">Cancel</button>
+                <button id="modalActionBtn" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        checkAuth();
+
+        function renderDashboard() {
+            const store = getStore();
+            const user = store.user;
+            const transactions = store.transactions.slice(0, 5);
+
+            document.getElementById('welcomeUser').innerText = `Welcome back, ${user.name}`;
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('balanceAmount').innerText = formatCurrency(user.balance);
+            document.getElementById('userAvatar').innerText = user.name.split(' ').map(n => n[0]).join('');
+
+            // Calculate Monthly Income
+            const currentMonth = new Date().getMonth();
+            const monthlyIncome = store.transactions
+                .filter(t => t.type === 'credit' && new Date(t.date).getMonth() === currentMonth)
+                .reduce((sum, t) => sum + t.amount, 0);
+            document.getElementById('incomeAmount').innerText = formatCurrency(monthlyIncome);
+
+            // Populate Card
+            document.getElementById('cardNumber').innerText = `**** **** **** ${user.cardNumber.slice(-4)}`;
+            document.getElementById('cardHolder').innerText = user.name.toUpperCase();
+            document.getElementById('cardExpiry').innerText = user.expiry;
+
+            // Populate Goals
+            const goalsList = document.getElementById('savingsGoals');
+            goalsList.innerHTML = '';
+            store.goals.forEach(goal => {
+                const percent = Math.min((goal.current / goal.target) * 100, 100);
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="flex justify-between text-xs mb-2">
+                        <span>${goal.icon} ${goal.name}</span>
+                        <span class="font-bold">${percent.toFixed(0)}%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-fill" style="width: ${percent}%"></div>
+                    </div>
+                `;
+                goalsList.appendChild(div);
+            });
+
+            const transactionList = document.getElementById('recentTransactions');
+            transactionList.innerHTML = '';
+
+            transactions.forEach(t => {
+                const li = document.createElement('li');
+                li.className = 'transaction-item';
+                li.innerHTML = `
+                    <div class="flex gap-2 items-center">
+                        <div style="width: 40px; height: 40px; background: ${t.type === 'credit' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            ${t.type === 'credit' ? '💸' : '🛒'}
+                        </div>
+                        <div>
+                            <p style="font-weight: 500;">${t.description}</p>
+                            <p style="font-size: 0.75rem; color: var(--text-muted);">${t.date}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; color: ${t.type === 'credit' ? 'var(--secondary)' : 'var(--danger)'}">
+                            ${t.type === 'credit' ? '+' : '-'}${formatCurrency(t.amount)}
+                        </p>
+                    </div>
+                `;
+                transactionList.appendChild(li);
+            });
+        }
+
+        let currentModalAction = '';
+
+        function openModal(action) {
+            currentModalAction = action;
+            document.getElementById('modalTitle').innerText = action.charAt(0).toUpperCase() + action.slice(1);
+            document.getElementById('modalActionBtn').innerText = action.charAt(0).toUpperCase() + action.slice(1);
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        document.getElementById('modalActionBtn').addEventListener('click', () => {
+            const amount = parseFloat(document.getElementById('modalAmount').value);
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            const description = currentModalAction.charAt(0).toUpperCase() + currentModalAction.slice(1);
+            const result = addTransaction(currentModalAction === 'deposit' ? 'credit' : 'debit', amount, description);
+
+            if (result.success) {
+                closeModal();
+                renderDashboard();
+                showToast(`${currentModalAction.charAt(0).toUpperCase() + currentModalAction.slice(1)} successful!`, 'success');
+            } else {
+                showToast(result.message, 'danger');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDashboard();
+            drawTrendChart('trendChart');
+        });
+    </script>
+</body>
+
+</html>

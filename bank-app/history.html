@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Caixa Bank</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            width: auto;
+            min-width: 200px;
+            margin-bottom: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+    </style>
+</head>
+
+<body class="bg-mesh-history">
+    <aside class="sidebar">
+        <div class="flex justify-between items-center" style="margin-bottom: 3rem; padding-left: 1rem;">
+            <div class="flex items-center gap-2">
+                <img src="logo.png" alt="Logo" style="width: 32px;">
+                <h2 style="color: white; font-weight: 700;">Caixa Bank</h2>
+            </div>
+        </div>
+        <nav style="display: flex; flex-direction: column; gap: 0.25rem; margin-top: 1rem;">
+            <a href="dashboard.html" class="nav-link">
+                <span>🏠</span> Dashboard
+            </a>
+            <a href="transfer.html" class="nav-link">
+                <span>💸</span> Transfer
+            </a>
+            <a href="history.html" class="nav-link active">
+                <span>📜</span> History
+            </a>
+            <a href="profile.html" class="nav-link">
+                <span>👤</span> Profile
+            </a>
+        </nav>
+        <div style="margin-top: auto;">
+            <button onclick="logout()" class="btn btn-outline"
+                style="width: 100%; border-color: var(--danger); color: var(--danger);">
+                Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <div class="top-bar">
+        <div class="flex items-center gap-2">
+            <img src="logo.png" alt="Logo" style="width: 24px;">
+            <h2 style="color: var(--primary); font-size: 1.25rem;">Caixa Bank</h2>
+        </div>
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    </div>
+
+    <main class="main-content">
+        <header style="margin-bottom: 2rem;">
+            <h1>Transaction History</h1>
+            <p style="color: var(--text-muted);">Monitor and filter your recent activity</p>
+        </header>
+
+        <section class="card">
+            <div class="filter-bar">
+                <input type="text" id="searchInput" placeholder="Search description..." onkeyup="renderHistory()">
+                <select id="typeFilter" onchange="renderHistory()">
+                    <option value="all">All Types</option>
+                    <option value="credit">Income (Credit)</option>
+                    <option value="debit">Expenses (Debit)</option>
+                </select>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- JS populated -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer
+            style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.875rem;">
+            <div class="flex justify-center gap-4" style="margin-bottom: 1rem;">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+            <p>&copy; 2026 Caixa Bank. All rights reserved. Your trust, our priority.</p>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        checkAuth();
+
+        function renderHistory() {
+            const store = getStore();
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+
+            const filtered = store.transactions.filter(t => {
+                const matchesSearch = t.description.toLowerCase().includes(searchTerm);
+                const matchesType = typeFilter === 'all' || t.type === typeFilter;
+                return matchesSearch && matchesType;
+            });
+
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            filtered.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="color: var(--text-muted);">${t.date}</td>
+                    <td style="font-weight: 500;">${t.description}</td>
+                    <td>
+                        <span style="color: ${t.type === 'credit' ? 'var(--secondary)' : 'var(--danger)'}; font-weight: 500;">
+                            ${t.type === 'credit' ? 'Credit' : 'Debit'}
+                        </span>
+                    </td>
+                    <td style="font-weight: 600;">${t.type === 'debit' ? '-' : '+'}${formatCurrency(t.amount)}</td>
+                    <td><span class="status-badge status-completed">${t.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">No transactions found</td></tr>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', renderHistory);
+    </script>
+</body>
+
+</html>

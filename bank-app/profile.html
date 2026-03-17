@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Caixa Bank</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-mesh-profile">
+    <aside class="sidebar">
+        <div class="flex justify-between items-center" style="margin-bottom: 3rem; padding-left: 1rem;">
+            <div class="flex items-center gap-2">
+                <img src="logo.png" alt="Logo" style="width: 32px;">
+                <h2 style="color: white; font-weight: 700;">Caixa Bank</h2>
+            </div>
+        </div>
+        <nav style="display: flex; flex-direction: column; gap: 0.25rem; margin-top: 1rem;">
+            <a href="dashboard.html" class="nav-link">
+                <span>🏠</span> Dashboard
+            </a>
+            <a href="transfer.html" class="nav-link">
+                <span>💸</span> Transfer
+            </a>
+            <a href="history.html" class="nav-link">
+                <span>📜</span> History
+            </a>
+            <a href="profile.html" class="nav-link active">
+                <span>👤</span> Profile
+            </a>
+        </nav>
+        <div style="margin-top: auto;">
+            <div id="themeToggle" onclick="toggleTheme()" class="btn btn-outline"
+                style="width: 100%; margin-bottom: 0.5rem; justify-content: center;">
+                🌓 Toggle Dark Mode
+            </div>
+            <button onclick="logout()" class="btn btn-outline"
+                style="width: 100%; border-color: var(--danger); color: var(--danger);">
+                Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <div class="top-bar">
+        <div class="flex items-center gap-2">
+            <img src="logo.png" alt="Logo" style="width: 24px;">
+            <h2 style="color: var(--primary); font-size: 1.25rem;">Caixa Bank</h2>
+        </div>
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    </div>
+
+    <main class="main-content">
+        <header style="margin-bottom: 2rem;">
+            <h1>User Profile</h1>
+            <p style="color: var(--text-muted);">Manage your personal information</p>
+        </header>
+
+        <div class="card" style="max-width: 600px;">
+            <div class="flex items-center gap-2"
+                style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);">
+                <div id="profileAvatar"
+                    style="width: 80px; height: 80px; background: var(--primary); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">
+                    JD
+                </div>
+                <div>
+                    <h2 id="displayName">John Doe</h2>
+                    <p id="displayAccount" style="color: var(--text-muted); font-family: monospace;">A/C: 8822446600</p>
+                </div>
+            </div>
+
+            <form id="profileForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label>Full Name</label>
+                        <input type="text" id="profName" required>
+                    </div>
+                    <div>
+                        <label>Email Address</label>
+                        <input type="email" id="profEmail" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label>Phone Number</label>
+                        <input type="text" id="profPhone" required>
+                    </div>
+                    <div>
+                        <label>Next of Kin</label>
+                        <input type="text" id="profNextOfKin" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label>Residential Address</label>
+                    <textarea id="profAddress" rows="2"
+                        style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-card); color: var(--text-main); margin-bottom: 1rem;"></textarea>
+                </div>
+
+                <div>
+                    <label>Account Number</label>
+                    <input type="text" id="profAccount" disabled style="background: var(--bg-main);">
+                </div>
+
+                <div id="profileUpdateMsg" style="display: none; margin-bottom: 1rem;" class="text-success">
+                    Profile updated successfully!
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Save Changes</button>
+            </form>
+        </div>
+
+        <footer
+            style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.875rem;">
+            <div class="flex justify-center gap-4" style="margin-bottom: 1rem;">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+            <p>&copy; 2026 Caixa Bank. All rights reserved. Your trust, our priority.</p>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        checkAuth();
+
+        function loadProfile() {
+            const store = getStore();
+            const user = store.user;
+
+            document.getElementById('profName').value = user.name;
+            document.getElementById('profEmail').value = user.email;
+            document.getElementById('profPhone').value = user.phone;
+            document.getElementById('profNextOfKin').value = user.nextOfKin || '';
+            document.getElementById('profAddress').value = user.address || '';
+            document.getElementById('profAccount').value = user.accountNo;
+
+            document.getElementById('displayName').innerText = user.name;
+            document.getElementById('displayAccount').innerText = `A/C: ${user.accountNo}`;
+            document.getElementById('profileAvatar').innerText = user.name.split(' ').map(n => n[0]).join('');
+        }
+
+        document.getElementById('profileForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const store = getStore();
+
+            store.user.name = document.getElementById('profName').value;
+            store.user.email = document.getElementById('profEmail').value;
+            store.user.phone = document.getElementById('profPhone').value;
+            store.user.nextOfKin = document.getElementById('profNextOfKin').value;
+            store.user.address = document.getElementById('profAddress').value;
+
+            updateStore(store);
+            loadProfile();
+
+            const msg = document.getElementById('profileUpdateMsg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        });
+
+        document.addEventListener('DOMContentLoaded', loadProfile);
+    </script>
+</body>
+
+</html>

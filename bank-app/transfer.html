@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer - Caixa Bank</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .transfer-form {
+            max-width: 500px;
+        }
+    </style>
+</head>
+
+<body class="bg-mesh-transfer">
+    <aside class="sidebar">
+        <div class="flex justify-between items-center" style="margin-bottom: 3rem; padding-left: 1rem;">
+            <div class="flex items-center gap-2">
+                <img src="logo.png" alt="Logo" style="width: 32px;">
+                <h2 style="color: white; font-weight: 700;">Caixa Bank</h2>
+            </div>
+        </div>
+        <nav style="display: flex; flex-direction: column; gap: 0.25rem; margin-top: 1rem;">
+            <a href="dashboard.html" class="nav-link">
+                <span>🏠</span> Dashboard
+            </a>
+            <a href="transfer.html" class="nav-link active">
+                <span>💸</span> Transfer
+            </a>
+            <a href="history.html" class="nav-link">
+                <span>📜</span> History
+            </a>
+            <a href="profile.html" class="nav-link">
+                <span>👤</span> Profile
+            </a>
+        </nav>
+        <div style="margin-top: auto;">
+            <button onclick="logout()" class="btn btn-outline"
+                style="width: 100%; border-color: var(--danger); color: var(--danger);">
+                Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <div class="top-bar">
+        <div class="flex items-center gap-2">
+            <img src="logo.png" alt="Logo" style="width: 24px;">
+            <h2 style="color: var(--primary); font-size: 1.25rem;">Caixa Bank</h2>
+        </div>
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    </div>
+
+    <main class="main-content">
+        <header style="margin-bottom: 2rem;">
+            <h1>Transfer Money</h1>
+            <p style="color: var(--text-muted);">Send money instantly to any account</p>
+        </header>
+
+        <section class="card">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('intra')">Intra-Bank</div>
+                <div class="tab" onclick="switchTab('inter')">Inter-Bank</div>
+            </div>
+
+            <div id="intraForm" class="transfer-form">
+                <h3>To Caixa Bank Account</h3>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem;">Free instant transfers
+                    between Caixa Bank accounts.</p>
+
+                <form id="intraTransferForm">
+                    <label>Recipient Account Number</label>
+                    <input type="text" placeholder="Enter 10-digit number" required pattern="\d{10}">
+
+                    <label>Amount (€)</label>
+                    <input type="number" step="0.01" placeholder="0.00" required>
+
+                    <label>Description (Optional)</label>
+                    <input type="text" placeholder="What's this for?">
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Send
+                        Money</button>
+                </form>
+            </div>
+
+            <div id="interForm" class="transfer-form" style="display: none;">
+                <h3>To Other Banks</h3>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem;">Transfers to other
+                    banks may take up to 24 hours. Fee: $1.50</p>
+
+                <form id="interTransferForm">
+                    <label>Select Bank</label>
+                    <select required>
+                        <option value="">Choose a bank...</option>
+                        <option value="chase">J.P. Morgan Chase</option>
+                        <option value="bofa">Bank of America</option>
+                        <option value="wells">Wells Fargo</option>
+                        <option value="citi">Citibank</option>
+                        <option value="pnc">PNC Bank</option>
+                        <option value="gs">Goldman Sachs</option>
+                        <option value="td">TD Bank</option>
+                        <option value="cap1">Capital One</option>
+                        <option value="usbank">U.S. Bank</option>
+                        <option value="hunt">Huntington Bank</option>
+                        <option value="ally">Ally Bank</option>
+                    </select>
+
+                    <label>Recipient Account Number</label>
+                    <input type="text" placeholder="Enter account number" required>
+
+                    <label>Amount (€)</label>
+                    <input type="number" step="0.01" placeholder="0.00" required>
+
+                    <label>Description (Optional)</label>
+                    <input type="text" placeholder="What's this for?">
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Send
+                        Money</button>
+                </form>
+            </div>
+        </section>
+
+        <div id="transferSuccess" class="card"
+            style="display: none; border-color: var(--secondary); background: rgba(16, 185, 129, 0.05);">
+            <div class="flex items-center gap-2">
+                <span style="font-size: 1.5rem;">✅</span>
+                <div>
+                    <h4 style="color: var(--secondary);">Transfer Successful!</h4>
+                    <p style="font-size: 0.875rem;">Your money has been sent. Check your history for details.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer
+            style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.875rem;">
+            <div class="flex justify-center gap-4" style="margin-bottom: 1rem;">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+            <p>&copy; 2026 Caixa Bank. All rights reserved. Your trust, our priority.</p>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        checkAuth();
+
+        function switchTab(type) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            if (type === 'intra') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('intraForm').style.display = 'block';
+                document.getElementById('interForm').style.display = 'none';
+            } else {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('intraForm').style.display = 'none';
+                document.getElementById('interForm').style.display = 'block';
+            }
+            document.getElementById('transferSuccess').style.display = 'none';
+        }
+
+        function handleTransfer(e, fee = 0) {
+            e.preventDefault();
+            const form = e.target;
+            const amountInput = form.querySelector('input[type="number"]');
+            const descInput = form.querySelector('input[type="text"]:last-of-type');
+
+            const amount = parseFloat(amountInput.value) + fee;
+            const description = descInput.value || "Money Transfer";
+
+            const result = addTransaction('debit', amount, description);
+
+            if (result.success) {
+                document.getElementById('transferSuccess').style.display = 'block';
+                form.reset();
+                showToast('Transfer completed successfully', 'success');
+                setTimeout(() => {
+                    document.getElementById('transferSuccess').style.display = 'none';
+                }, 5000);
+            } else {
+                showToast(result.message, 'danger');
+            }
+        }
+
+        document.getElementById('intraTransferForm').addEventListener('submit', (e) => handleTransfer(e, 0));
+        document.getElementById('interTransferForm').addEventListener('submit', (e) => handleTransfer(e, 1.50));
+    </script>
+</body>
+
+</html>
